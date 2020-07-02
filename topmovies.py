@@ -1,0 +1,32 @@
+from bs4 import BeautifulSoup
+import requests
+import random
+def get_movies(url):
+    page=requests.get(url)
+    soup=BeautifulSoup(page.text,'html.parser')
+    movies=soup.find_all("td",class_="titleColumn")
+    random.shuffle(movies)
+    return movies
+def get_summary(url):
+    movie_page=requests.get(url)
+    soup=BeautifulSoup(movie_page.text,'html.parser')
+    return soup.find("div",class_="summary_text").contents[0].strip()
+def get_movie_info(movie):
+    movie_title=movie.a.contents[0]
+    movie_year=movie.span.contents[0]
+    movie_url="http://www.imdb.com"+ movie.a['href']
+    return movie_title,movie_year,movie_url
+
+def movie_picker():
+    ctr=0
+    for movie in get_movies('https://www.imdb.com/chart/top/'):
+        movie_title,movie_year,movie_url=get_movie_info(movie)
+        movie_summary=get_summary(movie_url)
+        print(movie_title,movie_year)
+        print(movie_summary)
+        ctr=ctr+1
+        if(ctr==10):
+            break
+
+if __name__ == "__main__":
+     movie_picker()      
